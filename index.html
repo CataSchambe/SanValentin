@@ -280,9 +280,33 @@
             cursor: pointer; z-index: 300;
         }
         
-        @media (max-width: 400px) {
-            .envelope { transform: scale(0.8); }
+        @media (max-width: 480px) {
+            h1 { 
+                font-size: 1.5rem; 
+            }
+
+            #angry-face .emoji { 
+                font-size: 5rem; /* Antes era 8rem */
+            } 
+            #angry-face .message { 
+                font-size: 1.2rem; /* Antes era 2rem */
+                margin-top: 5px;
+            }
+
+            .paper { 
+                padding: 15px; 
+                max-height: 80vh; 
+            }
+            .paper-content { 
+                font-size: 0.9rem; 
+            }
+            
+            .photo-gallery img {
+                width: 90px;
+                height: 90px;
+            }
         }
+         
     </style>
 </head>
 <body>
@@ -300,7 +324,7 @@
         </div>
 
         <div id="success-msg">
-            ¡Siii! Sabía que aceptarías ❤️ Te amo.
+            ¡Menos mal! ❤️
         </div>
 
         <div class="photo-gallery" id="gallery">
