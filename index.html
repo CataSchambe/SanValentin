@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para mi San Valentín</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Indie+Flower&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(220, 20, 60, 0.3);
+            z-index: 10;
+            position: relative;
+            max-width: 90%;
+            transition: all 0.5s ease;
+        }
+
+        h1 {
+            color: #d32f2f;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+        }
+
+        #btn-si {
+            background-color: #d32f2f;
+            color: white;
+            box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4);
+        }
+
+        #btn-si:hover { transform: scale(1.1); background-color: #b71c1c; }
+
+        #btn-no {
+            background-color: #ffcdd2;
+            color: #c62828;
+            order: -1; 
+        }
+
+        .final-buttons {
+            display: none;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        #btn-reset { background-color: #ff4081; color: white; }
+        #btn-letter { background-color: #880e4f; color: white; }
+
+        /* Galería de fotos */
+        .photo-gallery {
+            display: none; 
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            max-width: 600px;
+        }
+
+        .photo-gallery img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 3px solid #ff4081;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            opacity: 0; 
+            transform: scale(0);
+            animation: popIn 0.5s ease forwards;
+        }
+
+        @keyframes popIn { to { transform: scale(1); opacity: 1; } }
+
+        .heart-bg {
+            position: fixed;
+            color: #ff4081;
+            opacity: 0.7;
+            top: -10vh;
+            animation: fall linear infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+        /* Cara enojada */
+        #angry-face {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #angry-face .emoji { font-size: 12rem; line-height: 1; }
+        #angry-face .message {
+            color: #c62828; font-size: 3rem; font-weight: 900;
+            margin-top: 10px; text-transform: uppercase;
+            text-shadow: 2px 2px 0px white, -2px -2px 0px white, 2px -2px 0px white, -2px 2px 0px white;
+            white-space: nowrap;
+        }
+        .show-angry { transform: translate(-50%, -50%) scale(1) !important; }
+
+        #success-msg {
+            display: none;
+            color: #d32f2f;
+            margin-top: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* --- ESTILOS DEL SOBRE NUEVO (TAMAÑO GRANDE) --- */
+        .letter-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            cursor: pointer;
+            /* No usamos scale para que no pixelar, ajustamos medidas abajo */
+        }
+
+        .envelope {
+            position: relative;
+            width: 350px;  /* Más ancho */
+            height: 240px; /* Más alto */
+            background: #880e4f; 
+            border-radius: 5px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Solapa superior (Triángulo) - Recalculada */
+        .lid {
+            position: absolute;
+            top: 0; left: 0; width: 0; height: 0;
+            /* La mitad del ancho es 175px */
+            border-left: 175px solid transparent; 
+            border-right: 175px solid transparent;
+            border-top: 130px solid #ad1457; 
+            transform-origin: top;
+            transition: transform 0.5s ease 0.5s;
+            z-index: 4;
+        }
+
+        .envelope::before { /* Izquierda y Derecha */
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 0; height: 0;
+            border-style: solid;
+            /* Ajustado a las nuevas medidas */
+            border-width: 120px 0 120px 175px; 
+            border-color: transparent transparent transparent #9c1255;
+            z-index: 3;
+        }
+        .envelope::after { /* Abajo y Derecha */
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0; width: 0; height: 0;
+            border-style: solid;
+            border-width: 0 0 120px 175px;
+            border-color: transparent transparent #880e4f transparent;
+            z-index: 3;
+            border-left: 175px solid #880e4f;
+            border-bottom: 120px solid #750841;
+            border-right: 175px solid #750841;
+            border-top: 120px solid transparent;
+            border: 0;
+        }
+        
+        .pocket {
+            position: absolute;
+            bottom: 0; left: 0; width: 0; height: 0;
+            border-left: 175px solid transparent;
+            border-right: 175px solid transparent;
+            border-bottom: 130px solid #911252;
+            z-index: 3;
+        }
+
+        /* La Carta GIGANTE */
+        .letter {
+            position: absolute;
+            top: 10px; left: 15px;
+            width: 320px; /* Ancho ajustado al sobre */
+            height: 450px; /* MUCHO MÁS ALTA para que entre el texto */
+            background: #fffdf5; 
+            border-radius: 5px;
+            z-index: 2;
+            transition: transform 0.8s ease; /* Más lento para más drama */
+            padding: 20px; /* Más espacio interno */
+            box-sizing: border-box;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            border: 4px double #d32f2f;
+            
+            /* Tipografía y Scroll */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Texto desde arriba */
+            align-items: center;
+            overflow-y: auto; /* Scroll si el texto es muy largo */
+        }
+
+        .letter p {
+            font-family: 'Indie Flower', cursive; /* Letra estilo mano pero legible */
+            font-size: 1.1rem; /* Tamaño cómodo */
+            color: #4a1c30;
+            text-align: left; /* Alineado a la izquierda como carta real */
+            margin: 0;
+            line-height: 1.6;
+            width: 100%;
+        }
+
+        .letter strong {
+            color: #d32f2f;
+        }
+
+        /* Scrollbar finita para la carta */
+        .letter::-webkit-scrollbar { width: 6px; }
+        .letter::-webkit-scrollbar-thumb { background: #ffcdd2; border-radius: 10px; }
+
+        /* Animación al abrir */
+        .envelope-wrapper.open .lid {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .envelope-wrapper.open .letter {
+            /* Sube mucho más arriba porque la carta es muy alta */
+            transform: translateY(-200px); 
+            transition: transform 0.6s ease 0.5s; 
+            z-index: 5; 
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px; right: 20px;
+            font-size: 2rem; color: white;
+            cursor: pointer; z-index: 300;
+        }
+        
+        @media (max-width: 400px) {
+            .envelope { transform: scale(0.8); }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="musica.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="container">
+        <h1 id="main-title">¿Querés ser mi San Valentín?</h1>
+        
+        <div class="btn-container" id="buttons-box">
+            <button id="btn-no">No</button>
+            <button id="btn-si">Sí, mi amor</button>
+        </div>
+
+        <div id="success-msg">
+            ¡Siii! Sabía que aceptarías ❤️ Te amo.
+        </div>
+
+        <div class="photo-gallery" id="gallery">
+            <img src="foto1.jpg" style="animation-delay: 0.1s">
+            <img src="foto2.jpg" style="animation-delay: 0.2s">
+            <img src="foto3.jpg" style="animation-delay: 0.3s">
+            <img src="foto4.jpg" style="animation-delay: 0.4s">
+            <img src="foto5.jpg" style="animation-delay: 0.5s">
+            <img src="foto6.jpg" style="animation-delay: 0.6s">
+        </div>
+
+        <div class="final-buttons" id="final-btns">
+            <button id="btn-reset">↺ Volver a ver</button>
+            <button id="btn-letter">💌 Cartita Virtual</button>
+        </div>
+    </div>
+
+    <div id="angry-face">
+        <div class="emoji">😡</div>
+        <div class="message"> Ah, queres que te mate?</div>
+    </div>
+
+    <div class="letter-overlay" id="letter-overlay">
+        <div class="close-btn" id="close-letter">&times;</div>
+        
+        <div class="envelope-wrapper" id="envelope-wrapper">
+            <div class="envelope">
+                <div class="lid"></div>
+                <div class="pocket"></div>
+                
+                <div class="letter">
+                    <p>
+                        <strong>Hola, Santi ❤️</strong>
+                        <br><br>
+                        Este pequeño "regalo" no es solo código, es mi forma de decirte que te sigo eligiendo.
+                        <br><br>
+                        Ya van 6 años de caminar juntos (y casi 8 desde que nos empezamos a gustar), y aunque sé que venimos de una mala racha, estoy segura de que lo que tenemos es más fuerte. Quiero que este San Valentín sea un punto de partida para dejar lo malo atrás y seguir construyendo nuestra historia.
+                        <br><br>
+                        A pesar de los <em>bugs</em> recientes y la mala racha, el sistema sigue en pie porque el núcleo es sólido. Este mensaje es un nuevo punto de partida y espero que ambos hagamos lo necesario para que sigamos funcionando, y mejor que nunca.
+                        <br><br>
+                        Gracias por ser mi compañero.<br>
+                        Estoy lista para el <strong>deploy</strong> de nuestra próxima etapa. Te amo.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const btnSi = document.getElementById('btn-si');
+        const btnNo = document.getElementById('btn-no');
+        const mainTitle = document.getElementById('main-title');
+        const buttonsBox = document.getElementById('buttons-box');
+        const successMsg = document.getElementById('success-msg');
+        const gallery = document.getElementById('gallery');
+        const angryFace = document.getElementById('angry-face');
+        const audio = document.getElementById('bg-music');
+        const finalBtns = document.getElementById('final-btns');
+        const btnReset = document.getElementById('btn-reset');
+        
+        const btnLetter = document.getElementById('btn-letter');
+        const letterOverlay = document.getElementById('letter-overlay');
+        const closeLetter = document.getElementById('close-letter');
+        const envelopeWrapper = document.getElementById('envelope-wrapper');
+
+        function createHearts() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-bg');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+            heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 5000);
+        }
+        setInterval(createHearts, 200);
+
+        btnSi.addEventListener('click', () => {
+            mainTitle.style.display = 'none';
+            buttonsBox.style.display = 'none';
+            successMsg.style.display = 'block';
+            gallery.style.display = 'flex'; 
+            finalBtns.style.display = 'flex'; 
+            audio.play().catch(e => console.log("Error audio:", e));
+            for(let i=0; i<50; i++) setTimeout(createHearts, i*50);
+        });
+
+        btnNo.addEventListener('click', () => {
+            angryFace.classList.add('show-angry');
+            btnNo.style.display = 'none';
+            setTimeout(() => { angryFace.classList.remove('show-angry'); }, 3000);
+        });
+
+        btnLetter.addEventListener('click', () => {
+            letterOverlay.style.display = 'flex';
+            setTimeout(() => {
+                envelopeWrapper.classList.add('open');
+            }, 100);
+        });
+
+        closeLetter.addEventListener('click', () => {
+            envelopeWrapper.classList.remove('open');
+            setTimeout(() => {
+                letterOverlay.style.display = 'none';
+            }, 500); 
+        });
+
+        btnReset.addEventListener('click', () => {
+            audio.pause();
+            audio.currentTime = 0;
+            successMsg.style.display = 'none';
+            gallery.style.display = 'none';
+            finalBtns.style.display = 'none';
+            mainTitle.style.display = 'block';
+            buttonsBox.style.display = 'flex';
+            btnNo.style.display = 'inline-block';
+        });
+    </script>
+</body>
+</html>
